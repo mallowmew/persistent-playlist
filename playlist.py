@@ -1,7 +1,6 @@
 from os import listdir, remove
 from os.path import isfile, isdir, join 
 from pathlib import Path
-import sys
 import argparse
 import re
 import mpv
@@ -67,11 +66,11 @@ while True:
         player.play(video_path)
         player.wait_for_playback()
         remove_first_line_of_playlist()
-        prompt_string = 'Play next? \033[K'
+        prompt_string = 'Play next? '
 
     except ShutdownError:
         print('\nPlayback ended by user.', end='')
-        prompt_string = 'Retry? \033[K'
+        prompt_string = 'Retry? '
 
     finally:
         player.terminate()
