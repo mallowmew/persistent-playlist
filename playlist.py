@@ -4,6 +4,7 @@ from pathlib import Path
 import sys
 import subprocess
 import argparse
+import re
 
 extensions = ['mkv', 'mp4']
 
@@ -61,7 +62,7 @@ while True:
         continue
 
     key_input = input('Play next? ')
-    if key_input == 'y':
+    if re.match('^[Y|y]e?s?', key_input):
         continue
     else:
         quit()
