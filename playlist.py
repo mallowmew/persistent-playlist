@@ -3,6 +3,7 @@ from os.path import isfile, isdir, join
 from pathlib import Path
 import sys
 import subprocess
+import argparse
 
 extensions = ['mkv', 'mp4']
 
@@ -19,9 +20,16 @@ def remove_first_line_of_playlist():
     with open(playlist_path, 'w') as list_out:
         list_out.writelines(data[1:])
 
-current_path = sys.argv[1]
+parser = argparse.ArgumentParser()
+parser.add_argument('path', metavar='path', type=str, help='The directory path to play')
+parser.add_argument('-a', '--auto', action='store_true', default=False)
+args = parser.parse_args()
+
+print(args)
+
+current_path = args.path
 if not isdir(current_path):
-    print("Error: First argument must be a directory.")
+    print('Error: Arguments must contain a directory.')
     quit()
 
 playlist_path = Path(join(current_path, 'playlist.txt'))
