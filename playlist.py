@@ -35,7 +35,7 @@ if not isdir(current_path):
 playlist_path = Path(join(current_path, 'playlist.txt'))
 
 if not playlist_path.is_file():
-    print("Playlist file not found in directory. Creating playlist.txt")
+    print('Playlist file not found in directory. Creating playlist.txt')
     with open(playlist_path, 'x') as playlist:
         videofiles = [v for v in listdir(current_path) if isfile(join(current_path, v)) and isExt(v, extensions)]
         videofiles = map(lambda v: v + '\n', videofiles)
@@ -46,21 +46,21 @@ while True:
         video_filename = playlist.readline().rstrip('\n')
 
     if video_filename == '':
-        print("No unplayed files in directory.")
+        print('No unplayed video files in directory.')
         remove(playlist_path)
-        print("Empty playlist file deleted.")
+        print('Playlist file deleted.')
         quit()
     else:
         video_path = join(current_path, video_filename)
 
-    print("Now playing: " + video_filename)
+    print('Now playing: ' + video_filename)
     play_video(video_path)
     remove_first_line_of_playlist()
 
     if ('--auto' in sys.argv) or ('-a' in sys.argv):
         continue
 
-    key_input = input("Play next? ")
+    key_input = input('Play next? ')
     if key_input == 'y':
         continue
     else:
