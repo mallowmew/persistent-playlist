@@ -57,7 +57,7 @@ while True:
     play_video(video_path)
     remove_first_line_of_playlist()
 
-    if ('--auto' in sys.argv) or ('-a' in sys.argv):
+    if (args.auto):
         continue
 
     key_input = input('Play next? ')
