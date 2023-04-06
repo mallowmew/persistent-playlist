@@ -6,7 +6,7 @@ from pathlib import Path
 import mpv
 from mpv import ShutdownError
 
-extensions = ['mkv', 'mp4', 'ogm', 'avi']
+extensions = ['mkv', 'mp4', 'avi']
 
 def isExt(fileName, exts):
   return True in map(fileName.lower().endswith, ("." + e.lower() for e in exts))
@@ -19,7 +19,8 @@ def createPlaylist(path, file, exts):
 
 parser = argparse.ArgumentParser()
 parser.add_argument('path', metavar='path', type=str, help='The directory path to play')
-parser.add_argument('-m', '--m3u', action="store_true", default=False, dest="m3u", help='Only create an m3u playlist.')
+parser.add_argument('-m', '--m3u', action="store_true", default=False, dest='m3u', help='Only create an m3u playlist.')
+parser.add_argument('-e', '--ext', action="extend", default=[], dest='ext', nargs="+", type=str, help='Specify the file extension(s) to search the folder for.')
 args = parser.parse_args()
 
 current_path = args.path
@@ -28,6 +29,9 @@ if not isdir(current_path):
     quit()
 
 playlist_file = Path(join(current_path, 'playlist.m3u'))
+
+if args.ext:
+    extensions = args.ext
 
 if args.m3u:
     createPlaylist(current_path, playlist_file, extensions)
