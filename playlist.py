@@ -66,7 +66,8 @@ def time_observer(_name, value):
         hours, r = divmod(value, 3600)
         minutes, seconds = divmod(r, 60)
         time = f'{int(hours):01}:{int(minutes):02}:{int(seconds):02}'
-        print('Playing \'' + player.playlist[player.playlist_pos]['filename'] + '\' at ' + time, end='\033[K\r')
+        name = player.playlist[player.playlist_pos]['filename']
+        print(f'Playing \'{name}\' at {time}', end='\033[K\r')
 
 while True:
     if not playlist:
