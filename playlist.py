@@ -12,8 +12,11 @@ def isExt(fileName, exts):
   return True in map(fileName.lower().endswith, ("." + e.lower() for e in exts))
 
 def createPlaylist(path, file, exts):
+    playlist_out = [v for v in listdir(path) if isfile(join(path, v)) and isExt(v, exts)]
+    if not playlist_out:
+        print(f'No files with extension(s) {exts} found in folder. Playlist not created.')
+        quit()
     with open(file, 'w') as playlist_f:
-        playlist_out = [v for v in listdir(path) if isfile(join(path, v)) and isExt(v, exts)]
         data = map(lambda v: v + '\n', playlist_out)
         playlist_f.writelines(data)
 
