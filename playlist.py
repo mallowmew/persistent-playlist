@@ -73,7 +73,7 @@ for i, video in enumerate(playlist):
     if not video == playlist[current]:  # if not the file already loaded
         player.playlist_append(video)
         player.playlist_move(len(player.playlist)-1, i)  # move the newly added file around
-player.playlist_pos = current
+player.playlist_play_index(current)
 
 while True:
     try:
