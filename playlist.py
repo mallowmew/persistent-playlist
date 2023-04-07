@@ -15,8 +15,7 @@ def findFiles(path, exts):
 
 def writePlaylist(file_list, file):
     with open(file, 'w') as list_f:
-        data = map(lambda v: v + '\n', file_list)
-        list_f.writelines(data)
+        list_f.writelines('\n'.join(file_list))
 
 parser = argparse.ArgumentParser()
 parser.add_argument('path', metavar='path', type=str, help='The directory path to play')
@@ -55,7 +54,6 @@ if args.m3u:
 if current_file.is_file():
     with open(current_file, 'r') as current_f:
         current = playlist.index(current_f.readline().strip('\n'))
-        print(current)
 
 player = mpv.MPV(input_default_bindings=True, input_vo_keyboard=True, osc=True)
 
@@ -92,5 +90,6 @@ while True:
     except ShutdownError:
         player.terminate()
         print(f'\033[1APlaying \'{previous_filename}\' interrupted by user.', end='\033[K')
-        writePlaylist(playlist[current:current+1], current_file)
+        with open(current_file, 'w') as current_f:
+            current_f.writelines(playlist[current:current+1])
         quit()
