@@ -85,7 +85,8 @@ while True:
         player.wait_for_playback()
         print(f'Playing \'{previous_filename}\' finished.', end='\033[K\n')
         playlist = player.playlist_filenames[player.playlist_pos:]
-        if player.playlist_pos == -1:
+        if player.playlist_pos == -1:  # MPV returns playlist position of -1 when it reaches the end of the current playlist
+            player.terminate()
             remove(playlist_file)
             print('Playlist finished!\nRemoved \'playlist.m3u\'.')
             quit()
