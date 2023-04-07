@@ -14,9 +14,9 @@ def findFiles(path, exts):
     return [v for v in listdir(path) if isfile(join(path, v)) and isExt(v, exts)]
 
 def writePlaylist(file_list, file):
-    with open(file, 'w') as playlist_f:
+    with open(file, 'w') as list_f:
         data = map(lambda v: v + '\n', file_list)
-        playlist_f.writelines(data)
+        list_f.writelines(data)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('path', metavar='path', type=str, help='The directory path to play')
@@ -30,38 +30,32 @@ if not isdir(current_path):
     quit()
 
 playlist_file = Path(join(current_path, 'playlist.m3u'))
+current_file = Path(join(current_path, 'current.txt'))
 
 extensions = args.ext
 
+playlist = findFiles(current_path, extensions)
+current = 0
+
+if not playlist:
+    print(f'No files with extension(s) {extensions} found in folder. Playlist not created.')
+    quit()
+
 if args.m3u:
-    file_list = findFiles(current_path, extensions)
-    if file_list and playlist_file.is_file():
-        key_input = input(f'{len(file_list)} file matches found. This will overwrite existing \'playlist.m3u\', continue? ')
+    if playlist and playlist_file.is_file():
+        key_input = input(f'{len(playlist)} file matches found. This will overwrite existing \'playlist.m3u\', continue? ')
         if re.match('^[Y|y]e?s?', key_input):
-            writePlaylist(file_list, playlist_file)
+            writePlaylist(playlist, playlist_file)
             print('Created \'playlist.m3u\'.')
-    elif file_list:
-        writePlaylist(file_list, playlist_file)
+    elif playlist:
+        writePlaylist(playlist, playlist_file)
         print('Created \'playlist.m3u\'.')
-    else:
-        print(f'No files with extension(s) {extensions} found in folder. Playlist not created.')
     quit()
 
-if not playlist_file.is_file():
-    playlist = findFiles(current_path, extensions)
-    if not playlist:
-        print(f'No files with extension(s) {extensions} found in folder. Playlist not created.')
-        quit()
-    writePlaylist(playlist, playlist_file)
-    print('Playlist file not found in directory.\nCreated \'playlist.m3u\'.')
-else:
-    with open(playlist_file, 'r') as playlist_f:
-        playlist = playlist_f.read().splitlines()
-
-if not playlist:  # an empty list is a falsy value
-    remove(playlist_file)
-    print('No unplayed video files in directory.\nRemoved \'playlist.m3u\'.')
-    quit()
+if current_file.is_file():
+    with open(current_file, 'r') as current_f:
+        current = playlist.index(current_f.readline().strip('\n'))
+        print(current)
 
 player = mpv.MPV(input_default_bindings=True, input_vo_keyboard=True, osc=True)
 
@@ -77,22 +71,22 @@ def time_observer(_name, value):
 
 for video in playlist:
     player.playlist_append(video)
-player.playlist_pos = 0  # also starts MPV
+player.playlist_play_index(current)
 
 while True:
     try:
         previous_filename = player.playlist_filenames[player.playlist_pos]
         player.wait_for_playback()
         print(f'Playing \'{previous_filename}\' finished.', end='\033[K\n')
-        playlist = player.playlist_filenames[player.playlist_pos:]
+        current = player.playlist_pos
         if player.playlist_pos == -1:  # MPV returns playlist position of -1 when it reaches the end of the current playlist
             player.terminate()
-            remove(playlist_file)
-            print('Playlist finished!\nRemoved \'playlist.m3u\'.')
+            remove(current_file)
+            print('Playlist finished!\nRemoved \'current.txt\'.')
             quit()
 
     except ShutdownError:
         player.terminate()
         print(f'\033[1APlaying \'{previous_filename}\' interrupted by user.', end='\033[K')
-        writePlaylist(playlist, playlist_file)
+        writePlaylist(playlist[current:current+1], current_file)
         quit()
