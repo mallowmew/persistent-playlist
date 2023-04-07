@@ -69,9 +69,13 @@ def time_observer(_name, value):
         name = player.playlist_filenames[player.playlist_pos]
         print(f'Playing \'{name}\' at {time}', end='\033[K\r')
 
-for video in playlist:
-    player.playlist_append(video)
-player.playlist_play_index(current)
+# have to do this weird stuff to make 'playing from partway through the playlist' work 🙃
+player.loadfile(playlist[current], 'append')
+for i, video in enumerate(playlist):
+    if not video == playlist[current]:  # if not the file already loaded
+        player.playlist_append(video)
+        player.playlist_move(len(player.playlist)-1, i)  # move the newly added file around
+player.playlist_pos = current
 
 while True:
     try:
