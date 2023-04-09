@@ -67,19 +67,16 @@ def time_observer(_name, value):
         name = player.playlist_filenames[player.playlist_pos]
         print(f'Playing \'{name}\' at {time}', end='\033[K\r')
 
-# have to do this weird stuff to make 'playing from partway through the playlist' work 🙃
-player.loadfile(playlist[current], 'append')
-for i, video in enumerate(playlist):
-    if not video == playlist[current]:  # if not the file already loaded
-        player.playlist_append(video)
-        player.playlist_move(len(player.playlist)-1, i)  # move the newly added file around
-player.playlist_play_index(current)
+for video in playlist:
+    player.playlist_append(video)
+player.playlist_play_index(0)  # start playback at 0 in the queue because ??? 
+player.wait_until_playing()  # wait for the player to catch up
+player.playlist_play_index(current)  # make it play the intended file
 
 while True:
     try:
         previous_filename = player.playlist_filenames[player.playlist_pos]
         player.wait_for_playback()
-        print(f'Playing \'{previous_filename}\' finished.', end='\033[K\n')
         current = player.playlist_pos
         if player.playlist_pos == -1:  # MPV returns playlist position of -1 when it reaches the end of the current playlist
             player.terminate()
@@ -89,7 +86,7 @@ while True:
 
     except ShutdownError:
         player.terminate()
-        print(f'\033[1APlaying \'{previous_filename}\' interrupted by user.', end='\033[K')
+        print(f'Playing \'{previous_filename}\' stopped by user.', end='\033[K')
         with open(current_file, 'w') as current_f:
-            current_f.writelines(playlist[current:current+1])
+            current_f.writelines(playlist[current])
         quit()
