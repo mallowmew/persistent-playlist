@@ -69,9 +69,9 @@ def time_observer(_name, value):
 
 for video in playlist:
     player.playlist_append(video)
-player.playlist_play_index(0)  # start playback at 0 in the queue because ??? 
-player.wait_until_playing()  # wait for the player to catch up
-player.playlist_play_index(current)  # make it play the intended file
+player.playlist_play_index(0)  # start playback at 0 in the queue because that starts the player
+player.wait_until_playing()  # wait for the player to catch up? 
+player.playlist_play_index(current)  # re-start playback at the intended file
 
 while True:
     try:
@@ -81,12 +81,12 @@ while True:
         if player.playlist_pos == -1:  # MPV returns playlist position of -1 when it reaches the end of the current playlist
             player.terminate()
             remove(current_file)
-            print('Playlist finished!\nRemoved \'current.txt\'.')
+            print('Playlist finished!\033[K\nRemoved \'current.txt\'.')
             quit()
 
     except ShutdownError:
         player.terminate()
-        print(f'Playing \'{previous_filename}\' stopped by user.', end='\033[K')
+        print(f'Playing \'{previous_filename}\' stopped by user.\033[K')
         with open(current_file, 'w') as current_f:
             current_f.writelines(playlist[current])
         quit()
